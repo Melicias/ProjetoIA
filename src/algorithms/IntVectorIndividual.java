@@ -1,6 +1,9 @@
 package algorithms;
 
+import ga.GeneticAlgorithm;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public abstract class IntVectorIndividual<P extends Problem, I extends IntVectorIndividual> extends Individual<P, I> {
     //TODO this class might require the definition of additional methods and/or attributes
@@ -10,7 +13,18 @@ public abstract class IntVectorIndividual<P extends Problem, I extends IntVector
     public IntVectorIndividual(P problem, int size) {
         super(problem);
         genome = new int[size];
-      }
+        for (int i = 0; i < genome.length; i++) {
+            genome[i] = i+1;
+        }
+
+        for(int i = 0; i< genome.length;i++){
+            int save = genome[i];
+            int ant = GeneticAlgorithm.random.nextInt(size);
+            genome[i] = genome[ant];
+            genome[ant] = save;
+        }
+        System.out.println(Arrays.toString(genome));
+    }
 
     public IntVectorIndividual(IntVectorIndividual<P, I> original) {
         super(original);

@@ -21,8 +21,8 @@ public class ProductDistributionProblem implements Problem<ProductDistributionIn
 
     @Override
     public ProductDistributionIndividual getNewIndividual() {
-        //TODO
-        throw new UnsupportedOperationException("Not implemented yet.");
+        //TODO feito mas confirmar se é o orders.size que queremos
+        return new ProductDistributionIndividual(this, orders.size()+numTrucks);
     }
 
     @Override
