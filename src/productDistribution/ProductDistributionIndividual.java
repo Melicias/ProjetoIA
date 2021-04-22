@@ -50,6 +50,7 @@ public class ProductDistributionIndividual extends IntVectorIndividual<ProductDi
     public double computeFitness() {
         //TODO
         ArrayList<ArrayList<Integer>> allTrucks = getOrdersForTruck();
+        ArrayList<Double> distancePerTruck = new ArrayList<>();
         double distance = 0;
         double falhas = 0;
         ArrayList<Order> orders = problem.getItems();
@@ -63,22 +64,25 @@ public class ProductDistributionIndividual extends IntVectorIndividual<ProductDi
                     boxes += orders.get(j).boxes;
                 }
                 distancia += orders.get(j-1).getPosition().distance(problem.getWarehousePosition());
-                distance = distancia;
+                distancePerTruck.add(distancia);
+                distance += distancia;
                 //acrescentar a distancia para o fitness e retirar pontos caso as caixas sejam superiores que o suportado
                 if(boxes > problem.getTrucksMaxBoxes()){
-                    falhas+=0.5;
+                    distance += 500;
                 }
             }else{
                 //penalty pq n tem viagens nenhumas
-                falhas++;
+                distance += 500;
             }
         }
-        /*System.out.println(distance);
-        System.out.println(fitness);
-        System.out.println("-------");*/
-        if(distance == 0)
-            System.out.println(genome);
-        fitness = distance/allTrucks.size() + (falhas*100);
+
+        double perfectAvg = distance / problem.getNumTrucks();
+        for(int i = 0;i < distancePerTruck.size();i++){
+            distance += distancePerTruck.get(i) +perfectAvg;
+
+        }
+
+        fitness = distance + falhas;
         return fitness;
     }
 
