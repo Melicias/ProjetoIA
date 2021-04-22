@@ -78,10 +78,9 @@ public class ProductDistributionIndividual extends IntVectorIndividual<ProductDi
 
         double perfectAvg = distance / problem.getNumTrucks();
         for(int i = 0;i < distancePerTruck.size();i++){
-            distance += distancePerTruck.get(i) +perfectAvg;
-
+            distance += distancePerTruck.get(i) > perfectAvg ? distancePerTruck.get(i) - perfectAvg : perfectAvg- distancePerTruck.get(i);
         }
-
+        System.out.println(distance);
         fitness = distance + falhas;
         return fitness;
     }
