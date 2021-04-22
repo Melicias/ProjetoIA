@@ -3,6 +3,7 @@ package productDistribution;
 import algorithms.IntVectorIndividual;
 import sun.lwawt.macosx.CSystemTray;
 
+import java.sql.Array;
 import java.sql.SQLOutput;
 import java.util.ArrayList;
 
@@ -31,6 +32,9 @@ public class ProductDistributionIndividual extends IntVectorIndividual<ProductDi
         ArrayList<ArrayList<Integer>> allTrucks = new ArrayList<>();
         int trucksBeginAt = problem.getItems().size();
         ArrayList<Integer> oneTruck = new ArrayList<>();
+        System.out.println("-------\n--------");
+        System.out.println(trucksBeginAt);
+        System.out.println(genome.length);
         for(int i = 0; i < genome.length; i++){
             if(trucksBeginAt < genome[i]){
                 allTrucks.add(oneTruck);
@@ -39,6 +43,7 @@ public class ProductDistributionIndividual extends IntVectorIndividual<ProductDi
                 oneTruck.add(genome[i]);
             }
         }
+        System.out.println("-------\n--------");
         return allTrucks;
     }
 
@@ -47,20 +52,35 @@ public class ProductDistributionIndividual extends IntVectorIndividual<ProductDi
         //TODO
         ArrayList<ArrayList<Integer>> allTrucks = getOrdersForTruck();
         double distance = 0;
+        double falhas = 0;
         ArrayList<Order> orders = problem.getItems();
         for(int i = 0; i < allTrucks.size();i++){
             if(allTrucks.get(i).size() > 0){
-                System.out.println(allTrucks.get(i).get(0));
-                distance += problem.getWarehousePosition().distance(orders.get(allTrucks.get(i).get(0)-1).getPosition());
+                double distancia = problem.getWarehousePosition().distance(orders.get(allTrucks.get(i).get(0)-1).getPosition());
+                int boxes = orders.get(allTrucks.get(i).get(0)-1).boxes;
                 int j = 1;
                 for( ;j < allTrucks.get(i).size(); j++){
-                    distance += orders.get(j-1).getPosition().distance(orders.get(j).getPosition());
+                    distancia += orders.get(j-1).getPosition().distance(orders.get(j).getPosition());
+                    boxes += orders.get(j).boxes;
                 }
-                distance += orders.get(j-1).getPosition().distance(problem.getWarehousePosition());
+                distancia += orders.get(j-1).getPosition().distance(problem.getWarehousePosition());
+                distance = distancia;
+                //acrescentar a distancia para o fitness e retirar pontos caso as caixas sejam superiores que o suportado
+                if(boxes > problem.getTrucksMaxBoxes()){
+                    falhas+=0.5;
+                }
+            }else{
+                //penalty pq n tem viagens nenhumas
+                falhas++;
             }
         }
-
-        return distance / problem.getNumTrucks();
+        /*System.out.println(distance);
+        System.out.println(fitness);
+        System.out.println("-------");*/
+        if(distance == 0)
+            System.out.println(genome);
+        fitness = distance/allTrucks.size() + (falhas*100);
+        return fitness;
     }
 
     @Override
