@@ -32,9 +32,6 @@ public class ProductDistributionIndividual extends IntVectorIndividual<ProductDi
         ArrayList<ArrayList<Integer>> allTrucks = new ArrayList<>();
         int trucksBeginAt = problem.getItems().size();
         ArrayList<Integer> oneTruck = new ArrayList<>();
-        System.out.println("-------\n--------");
-        System.out.println(trucksBeginAt);
-        System.out.println(genome.length);
         for(int i = 0; i < genome.length; i++){
             if(trucksBeginAt < genome[i]){
                 allTrucks.add(oneTruck);
@@ -43,7 +40,9 @@ public class ProductDistributionIndividual extends IntVectorIndividual<ProductDi
                 oneTruck.add(genome[i]);
             }
         }
-        System.out.println("-------\n--------");
+        if(oneTruck.size() != 0){
+            allTrucks.add(oneTruck);
+        }
         return allTrucks;
     }
 

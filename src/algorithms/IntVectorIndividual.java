@@ -12,6 +12,7 @@ public abstract class IntVectorIndividual<P extends Problem, I extends IntVector
 
     public IntVectorIndividual(P problem, int size) {
         super(problem);
+        size = size-1;
         genome = new int[size];
         for (int i = 0; i < genome.length; i++) {
             genome[i] = i+1;
