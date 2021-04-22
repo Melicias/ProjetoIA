@@ -6,11 +6,14 @@ import sun.lwawt.macosx.CSystemTray;
 import java.sql.Array;
 import java.sql.SQLOutput;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public class ProductDistributionIndividual extends IntVectorIndividual<ProductDistributionProblem, ProductDistributionIndividual> {
     //TODO this class might require the definition of additional methods and/or attributes
     private int size;
+    private double totalDistance;
+    private ArrayList<Integer> numberOfBoxes;
 
 
     public ProductDistributionIndividual(ProductDistributionProblem problem, int size) {
@@ -21,7 +24,8 @@ public class ProductDistributionIndividual extends IntVectorIndividual<ProductDi
 
     public ProductDistributionIndividual(ProductDistributionIndividual original) {
         super(original);
-        //nr de caixas e nr de camioes?
+        this.numberOfBoxes = original.numberOfBoxes;
+        this.totalDistance = original.totalDistance;
         //TODO
         //throw new UnsupportedOperationException("Not implemented yet.");
     }
@@ -40,56 +44,55 @@ public class ProductDistributionIndividual extends IntVectorIndividual<ProductDi
                 oneTruck.add(genome[i]);
             }
         }
-        if(oneTruck.size() != 0){
+        if(oneTruck.size() != 0)
             allTrucks.add(oneTruck);
-        }
+
         return allTrucks;
     }
 
     @Override
     public double computeFitness() {
         //TODO
+        this.numberOfBoxes = new ArrayList<>();
+        this.totalDistance = 0;
+
         ArrayList<ArrayList<Integer>> allTrucks = getOrdersForTruck();
-        ArrayList<Double> distancePerTruck = new ArrayList<>();
-        double distance = 0;
-        double falhas = 0;
+        double biggestDistance = 0;
+        int penalty = 0;
         ArrayList<Order> orders = problem.getItems();
         for(int i = 0; i < allTrucks.size();i++){
             if(allTrucks.get(i).size() > 0){
-                double distancia = problem.getWarehousePosition().distance(orders.get(allTrucks.get(i).get(0)-1).getPosition());
+                double distance = problem.getWarehousePosition().distance(orders.get(allTrucks.get(i).get(0)-1).getPosition());
                 int boxes = orders.get(allTrucks.get(i).get(0)-1).boxes;
                 int j = 1;
                 for( ;j < allTrucks.get(i).size(); j++){
-                    distancia += orders.get(j-1).getPosition().distance(orders.get(j).getPosition());
+                    distance += orders.get(j-1).getPosition().distance(orders.get(j).getPosition());
                     boxes += orders.get(j).boxes;
                 }
-                distancia += orders.get(j-1).getPosition().distance(problem.getWarehousePosition());
-                distancePerTruck.add(distancia);
-                distance += distancia;
-                //acrescentar a distancia para o fitness e retirar pontos caso as caixas sejam superiores que o suportado
+                distance += orders.get(j-1).getPosition().distance(problem.getWarehousePosition());
+                numberOfBoxes.add(boxes);
+                if(biggestDistance < distance)
+                    biggestDistance = distance;
+                totalDistance += distance;
+                //se houver mais caixas que camioes, adicionar outra penalizacao
                 if(boxes > problem.getTrucksMaxBoxes()){
-                    distance += 500;
+                    penalty += 500;
                 }
             }else{
-                //penalty pq n tem viagens nenhumas
-                distance += 500;
+                //penalty pq n tem viagens nenhumas da uma penalizacao
+                penalty += 500;
             }
         }
-
-        double perfectAvg = distance / problem.getNumTrucks();
-        for(int i = 0;i < distancePerTruck.size();i++){
-            distance += distancePerTruck.get(i) > perfectAvg ? distancePerTruck.get(i) - perfectAvg : perfectAvg- distancePerTruck.get(i);
-        }
-        System.out.println(distance);
-        fitness = distance + falhas;
+        fitness = biggestDistance + penalty;
         return fitness;
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("fitness: ");
-        sb.append(fitness);
+        sb.append("fitness: " + fitness + "\n");
+        sb.append("Total distance: " + totalDistance + "\n");
+        sb.append(numberOfBoxes.toString());
         //TODO
         return sb.toString();
     }
