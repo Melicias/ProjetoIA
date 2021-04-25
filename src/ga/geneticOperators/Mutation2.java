@@ -19,7 +19,7 @@ public class Mutation2<I extends IntVectorIndividual, P extends Problem<I>> exte
             i1 = GeneticAlgorithm.random.nextInt(ind.getNumGenes()-1)+1;
             i2 = GeneticAlgorithm.random.nextInt(ind.getNumGenes()-1)+1;
         }
-        for(int i = 0; i < i2-i1; i++){ // sacar de 2 numeros para dar swap entre o intervalo de i1 e i2
+        for(int i = 0; i < i2-i1; i++){ // sacar de 2 numeros para dar swap entre o intervalo de i1 e i2 --- ser anecessario adicionar mais interacoes?
             int s1 = GeneticAlgorithm.random.nextInt(i1)+(i2-i1);
             int s2 = GeneticAlgorithm.random.nextInt(i1)+(i2-i1);
             int first = ind.getGene(s1);
