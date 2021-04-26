@@ -11,7 +11,6 @@ import java.util.Arrays;
 
 public class ProductDistributionIndividual extends IntVectorIndividual<ProductDistributionProblem, ProductDistributionIndividual> {
     //TODO this class might require the definition of additional methods and/or attributes
-    private int size;
     private double totalDistance;
     private double longestDistance;
     private ArrayList<Integer> numberOfBoxes;
@@ -28,8 +27,8 @@ public class ProductDistributionIndividual extends IntVectorIndividual<ProductDi
         this.numberOfBoxes = original.numberOfBoxes;
         this.totalDistance = original.totalDistance;
         this.longestDistance = original.longestDistance;
+        this.numberOfBoxes = original.numberOfBoxes;
         //TODO
-        //throw new UnsupportedOperationException("Not implemented yet.");
     }
 
 
@@ -58,13 +57,14 @@ public class ProductDistributionIndividual extends IntVectorIndividual<ProductDi
         this.numberOfBoxes = new ArrayList<>();
         this.totalDistance = 0;
         this.longestDistance = 0;
-
-        ArrayList<ArrayList<Integer>> allTrucks = getOrdersForTruck();
-        double biggestDistance = 0;
         int penalty = 0;
+
+        ArrayList<Double> distancePerTruck = new ArrayList<>();
+        ArrayList<ArrayList<Integer>> allTrucks = getOrdersForTruck();
         ArrayList<Order> orders = problem.getItems();
         for(int i = 0; i < allTrucks.size();i++){
             if(allTrucks.get(i).size() > 0){
+
                 double distance = problem.getWarehousePosition().distance(orders.get(allTrucks.get(i).get(0)-1).getPosition());
                 int boxes = orders.get(allTrucks.get(i).get(0)-1).boxes;
                 int j = 1;
@@ -73,23 +73,27 @@ public class ProductDistributionIndividual extends IntVectorIndividual<ProductDi
                     boxes += orders.get(allTrucks.get(i).get(j)-1).boxes;
                 }
                 distance += orders.get(allTrucks.get(i).get(j-1)-1).getPosition().distance(problem.getWarehousePosition());
-                numberOfBoxes.add(boxes);
-                if(biggestDistance < distance)
-                    biggestDistance = distance;
-                totalDistance += distance;
-                //se houver mais caixas que camioes, adicionar outra penalizacao
-                if(boxes > problem.getTrucksMaxBoxes()){
+                if(this.longestDistance < distance)
+                    this.longestDistance = distance;
+                if(boxes > problem.getTrucksMaxBoxes())
                     penalty += 1000;
-                }
+                numberOfBoxes.add(boxes);
+                totalDistance += distance;
+                distancePerTruck.add(distance);
             }else{
-                //penalty pq n tem viagens nenhumas da uma penalizacao
                 penalty += 1000;
             }
         }
 
-        longestDistance = biggestDistance + penalty;
-        fitness = biggestDistance + penalty;
+        double perfectAvg = this.totalDistance / problem.getNumTrucks();
+        for(int i = 0;i < distancePerTruck.size();i++){
+            if(distancePerTruck.get(i)%perfectAvg >perfectAvg)
+                penalty += 0;
+        }
 
+        System.out.println(penalty);
+
+        fitness = this.longestDistance + penalty +totalDistance;
         return fitness;
     }
 
