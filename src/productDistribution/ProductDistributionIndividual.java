@@ -1,7 +1,7 @@
 package productDistribution;
 
 import algorithms.IntVectorIndividual;
-import sun.lwawt.macosx.CSystemTray;
+//import sun.lwawt.macosx.CSystemTray;
 
 import java.sql.Array;
 import java.sql.SQLOutput;
