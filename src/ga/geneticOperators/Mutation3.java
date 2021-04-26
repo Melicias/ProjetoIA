@@ -10,10 +10,24 @@ public class Mutation3<I extends IntVectorIndividual, P extends Problem<I>> exte
         super(probability);
     }
 
+    //Inversion
     @Override
     public void mutate(I ind) {
-        //TODO
-        throw new UnsupportedOperationException("Not implemented yet.");
+        int i1 = GeneticAlgorithm.random.nextInt(ind.getNumGenes()-1)+1;
+        int i2 = GeneticAlgorithm.random.nextInt(ind.getNumGenes()-1)+1;
+        while(i1 >= i2){
+            i1 = GeneticAlgorithm.random.nextInt(ind.getNumGenes()-1)+1;
+            i2 = GeneticAlgorithm.random.nextInt(ind.getNumGenes()-1)+1;
+        }
+        int midGene = ((i2-i1)/2)+i1;
+
+        for (; i1 <= midGene; i1++, i2--) {
+            int aux = ind.getGene(i1);
+            ind.setGene(i1, ind.getGene(i2));
+            ind.setGene(i2, aux);
+        }
+
+
     }
 
     @Override
